@@ -101,7 +101,7 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--coco_path', type=str, help='coco root path',
-                        default=os.environ['HOME'] + '/programs/cocoapi/')
+                        default=os.environ['HOME'] + '/cocoapi/')
     parser.add_argument('--interim_result_path', type=str,
                         help='Path to interim datafile',
                         default='Dataset/interim/')
