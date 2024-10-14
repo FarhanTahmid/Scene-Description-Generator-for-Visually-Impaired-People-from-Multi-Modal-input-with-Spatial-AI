@@ -7,3 +7,6 @@ cocoapi/
 
 # Data Folder
 Data/
+
+# outputs
+nohup.out

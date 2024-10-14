@@ -1,0 +1,1 @@
+# check if cuda is available at first
