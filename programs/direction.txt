@@ -1,0 +1,33 @@
+To get the paths for the YOLO model files, you'll typically need to download the following resources:
+
+1. **Darknet Framework**: 
+   - Clone the Darknet repository from GitHub:
+     ```bash
+     git clone https://github.com/AlexeyAB/darknet.git
+     ```
+   - This will create a folder named `darknet` containing the framework.
+
+2. **YOLO Configuration and Weights**:
+   - Download the configuration file and weights for the model you want (e.g., YOLOv3) from the official repository:
+     - **Configuration file**: `https://github.com/AlexeyAB/darknet/blob/master/cfg/yolov3.cfg`
+     - **Weights file**: `https://pjreddie.com/media/files/yolov3.weights`
+   - Place these files in the respective directories:
+     - `darknet/cfg/yolov3.cfg`
+     - `darknet/weights/yolov3.weights`
+
+3. **Classes File**:
+   - For the COCO dataset, the classes file can be found here: `https://github.com/pjreddie/darknet/blob/master/data/coco.names`.
+   - Save this file in `darknet/data/coco.names`.
+
+4. **Palette File** (if needed):
+   - This file is often used for visualization. You may find it in the Darknet repository or create one based on your needs.
+
+After downloading, your `darknet_path` should point to the directory where you cloned the Darknet repository, and your model files should be in the appropriate subdirectories. 
+
+Make sure the paths in your `__init__` method correctly point to these locations. For example:
+
+```python
+darknet_path = '/path/to/your/darknet/'
+```
+
+Adjust the paths in the code accordingly.
