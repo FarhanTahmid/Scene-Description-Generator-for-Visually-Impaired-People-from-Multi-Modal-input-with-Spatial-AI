@@ -1,0 +1,9 @@
+# environments
+.venv/
+.env
+
+# COCO API
+cocoapi/
+
+# Data Folder
+Data/
