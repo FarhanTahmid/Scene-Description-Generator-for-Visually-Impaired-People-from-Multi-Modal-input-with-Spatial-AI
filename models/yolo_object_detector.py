@@ -23,7 +23,7 @@ class YOLOObjectDetector(object):
 
     """
 
-    def __init__(self, darknet_path=os.environ['HOME'] + '/programs/darknet/',
+    def __init__(self, darknet_path=os.environ['PROJECT_DIRECTORY'] + 'programs/darknet/',
                  model_name='yolov3', dataset='coco', dim=480):
         """
         Construct the YOLOObjectDetector class.

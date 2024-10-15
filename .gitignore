@@ -11,3 +11,6 @@ Dataset/
 
 # outputs
 nohup.out
+
+# programs file
+programs/
