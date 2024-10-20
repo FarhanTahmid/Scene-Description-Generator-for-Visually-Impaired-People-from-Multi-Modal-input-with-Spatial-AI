@@ -15,7 +15,7 @@ def main(args):
     sets = ['train2014', 'val2014', 'train2017', 'val2017']
 
     for i, st in enumerate(sets):
-        print('Preprocessing ' + st + ' images with ' + args.model)
+        print('Preprocessing ' + st + ' images and objects with ' + args.model)
 
         # Get list of images
         images = [f.split('.')[0]
