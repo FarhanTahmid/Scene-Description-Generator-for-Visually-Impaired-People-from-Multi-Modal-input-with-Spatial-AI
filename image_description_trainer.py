@@ -255,7 +255,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--models_path', type=str, required=False,
                         help='Path to store models',
-                        default='models/')
+                        default='models/coco2017/')
     parser.add_argument('--beam_size', type=str, required=False,
                         help='Beam size to use during validation',
                         default=3)
@@ -294,7 +294,7 @@ if __name__ == '__main__':
                         default=64)
     parser.add_argument('--coco_set', type=int, required=False,
                         help='coco set year to use (2014/2017)',
-                        default=2014)
+                        default=2017)
     parser.add_argument('--load_features', type=bool, required=False,
                         help='Load image features or generate',
                         default=True)

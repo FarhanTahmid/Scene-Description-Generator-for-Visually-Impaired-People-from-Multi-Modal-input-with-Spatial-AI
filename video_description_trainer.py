@@ -255,7 +255,7 @@ def main(args):
                         'hidden_size': args.hidden_size,
                         'embed_size': args.embed_size,
                         'embedding_size': args.embedding_size,
-                        'rnn_type': args.rnn_type,
+                        'rnn_type': 'lstm',
                         'epoch': epoch}, filename)
 
 
@@ -320,8 +320,8 @@ if __name__ == '__main__':
     parser.add_argument('--hidden_size', type=int, required=False,
                         help='Hidden size for RNN',
                         default=512)
-    parser.add_argument('--rnn_type', type=int, required=False,
-                        help='Type of RNN unit',
-                        default='lstm')
+    # parser.add_argument('--rnn_type', type=int, required=False,
+    #                     help='Type of RNN unit',
+    #                     default='lstm')
     args = parser.parse_args()
     main(args)

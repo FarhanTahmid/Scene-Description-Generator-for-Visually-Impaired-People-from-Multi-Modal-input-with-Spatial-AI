@@ -11,6 +11,8 @@ Dataset/
 
 # outputs
 nohup.out
+videoTrain_nohup.out
+imageTrain2017_nohup.out
 
 # programs file
 programs/

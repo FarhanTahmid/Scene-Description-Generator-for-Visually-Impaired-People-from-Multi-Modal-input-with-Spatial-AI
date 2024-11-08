@@ -19,6 +19,7 @@ from torch.utils.data import Dataset, sampler, DataLoader
 
 DIR_NAME = os.environ['PROJECT_DIRECTORY']
 sys.path.append(DIR_NAME+'models/')
+sys.path.append(DIR_NAME+'software_utils/')
 
 from create_transformer import create_transformer
 from vocabulary import Vocabulary
