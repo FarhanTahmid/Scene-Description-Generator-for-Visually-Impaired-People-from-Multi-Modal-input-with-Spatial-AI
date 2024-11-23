@@ -8,6 +8,7 @@ cocoapi/
 # Data Folder
 Data/
 Dataset/
+test/
 
 # outputs
 nohup.out
@@ -19,3 +20,10 @@ programs/
 
 # model files
 image_caption-model**
+video_caption-model**
+video_caption-ckpt-model**
+video_models/
+
+# pycache
+__pycache__/
+

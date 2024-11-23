@@ -233,7 +233,7 @@ def main(args):
                             'hidden_size': args.hidden_size,
                             'embed_size': args.embed_size,
                             'embedding_size': args.embedding_size,
-                            'rnn_type': args.rnn_type,
+                            'rnn_type': args.decoder_type,
                             'epoch': epoch}, filename)
             else:
                 print("\nValidation -- bleu: %.4f, \
@@ -255,7 +255,7 @@ def main(args):
                         'hidden_size': args.hidden_size,
                         'embed_size': args.embed_size,
                         'embedding_size': args.embedding_size,
-                        'rnn_type': 'lstm',
+                        'rnn_type': args.decoder_type,
                         'epoch': epoch}, filename)
 
 
@@ -264,7 +264,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--models_path', type=str, required=False,
                         help='Path to store models',
-                        default='models/')
+                        default='models/video_models/')
     parser.add_argument('--beam_size', type=str, required=False,
                         help='Beam size to use during validation',
                         default=3)
@@ -277,7 +277,7 @@ if __name__ == '__main__':
     parser.add_argument('--videos_path', type=str, required=False,
                         help='Path to MSR-VTT videos',
                         default=DIR_NAME +
-                        'Database/MSR-VTT/TrainVal/')
+                        'Dataset/MSR-VTT/TrainVal/')
     parser.add_argument('--lr', type=float, required=False,
                         help='Learning rate',
                         default=0.001)
@@ -320,8 +320,7 @@ if __name__ == '__main__':
     parser.add_argument('--hidden_size', type=int, required=False,
                         help='Hidden size for RNN',
                         default=512)
-    # parser.add_argument('--rnn_type', type=int, required=False,
-    #                     help='Type of RNN unit',
-    #                     default='lstm')
+    parser.add_argument('--decoder_type',type=str,required=False,
+                        help="RNN Type",default='gru')
     args = parser.parse_args()
     main(args)

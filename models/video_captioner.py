@@ -20,7 +20,7 @@ class VideoCaptioner(nn.Module):
     def __init__(self, vid_embedding_size, embed_size, hidden_size,
                  vocab_size, max_caption_length=35, start_id=1,
                  end_id=2, num_layers=1, dropout_prob=0.2,
-                 rnn_type='lstm', rnn_dropout_prob=0.2):
+                 rnn_type='gru', rnn_dropout_prob=0.2):
         """
         Construct the VideoCaptioner CNN-RNN.
 
@@ -56,8 +56,10 @@ class VideoCaptioner(nn.Module):
 
         # Selected chosen rnn type
         if rnn_type.lower() == 'lstm':
+            print(f"Selected RNN Type is {rnn_type}")
             rnn_type = nn.LSTM
         else:
+            print(f"Selected RNN Type is {rnn_type}")
             rnn_type = nn.GRU
 
         # Layers for preprocessing frame embedding

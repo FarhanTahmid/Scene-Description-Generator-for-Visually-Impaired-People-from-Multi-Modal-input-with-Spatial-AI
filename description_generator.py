@@ -14,13 +14,17 @@ from scenedetect.stats_manager import StatsManager
 from scenedetect.detectors.content_detector import ContentDetector
 from scenedetect.detectors.threshold_detector import ThresholdDetector
 
+from typing import List, Tuple
+
 import cv2
 
 BASE_DIR=os.environ['PROJECT_DIRECTORY']
+sys.path.append(BASE_DIR+'software_utils/')
 
 # To account for path errors
 try:
     from models.image_captioner import ImageCaptioner
+    from models.video_captioner import VideoCaptioner
     from models.encoderCNN import EncoderCNN
 except ImportError:
     pass
@@ -32,31 +36,25 @@ except ImportError:
     pass
 
 
-class Narrator(object):
-    """
-    The Narrator class.
-
-    This class serves the models and frameworks within narrator in
-    a single object.
-    """
+class Generator(object):
     img_extensions = ['jpg', 'png', 'jpeg']
     vid_extensions = ['mp4', 'avi']
 
     def __init__(self,
-                 root_path=BASE_DIR,
-                 coco_vocab_path=BASE_DIR+'Data/processed/coco_vocab.pkl',
-                #  msrvtt_vocab_path='data/processed/msrvtt_vocab.pkl',
+                 root_path=os.environ['PROJECT_DIRECTORY'],
+                 coco_vocab_path='Data/processed/coco_vocab.pkl',
+                 msrvtt_vocab_path='Data/processed/msrvtt_vocab.pkl',
                  base_model='resnet152',
-                 ic_model_path='models/image_caption-model11-20-0.1309-5.0.pkl',
-                #  vc_model_path='models/video_caption-model11-160-0.3501-5.0.pkl',
+                 ic_model_path='models/image_caption-model11-80-0.1312-5.0.pkl',
+                 vc_model_path='models/video_models/video_caption-model11-110-0.3354-5.0.pkl',
                  im_embedding_size=2048,
-                #  vid_embedding_size=2048,
+                 vid_embedding_size=2048,
                  embed_size=256,
                  hidden_size=512,
                  num_frames=40,
                  max_caption_length=35,
                  ic_rnn_type='lstm',
-                #  vc_rnn_type='gru',
+                 vc_rnn_type='lstm',
                  im_res=224):
         """
         Construct the Narrator class.
@@ -80,12 +78,12 @@ class Narrator(object):
 
         # Store class variables
         self.num_frames = num_frames
-        # self.vid_embedding_size = vid_embedding_size
+        self.vid_embedding_size = vid_embedding_size
         self.max_caption_length = max_caption_length
 
         # Load vocabularies
-        # with open(root_path + msrvtt_vocab_path, 'rb') as f:
-        #     self.msrvtt_vocab = pickle.load(f)
+        with open(root_path + msrvtt_vocab_path, 'rb') as f:
+            self.msrvtt_vocab = pickle.load(f)
         with open(root_path + coco_vocab_path, 'rb') as f:
             self.coco_vocab = pickle.load(f)
 
@@ -112,23 +110,23 @@ class Narrator(object):
         self.image_captioner.load_state_dict(ic_checkpoint['params'])
 
         # Create video captioner and load weights
-        # self.video_captioner = VideoCaptioner(
-        #     vid_embedding_size,
-        #     embed_size,
-        #     hidden_size,
-        #     len(self.msrvtt_vocab),
-        #     rnn_type=vc_rnn_type,
-        #     start_id=self.msrvtt_vocab.word2idx[self.msrvtt_vocab.start_word],
-        #     end_id=self.msrvtt_vocab.word2idx[self.msrvtt_vocab.end_word]
-        # )
+        self.video_captioner = VideoCaptioner(
+            vid_embedding_size,
+            embed_size,
+            hidden_size,
+            len(self.msrvtt_vocab),
+            rnn_type=vc_rnn_type,
+            start_id=self.msrvtt_vocab.word2idx[self.msrvtt_vocab.start_word],
+            end_id=self.msrvtt_vocab.word2idx[self.msrvtt_vocab.end_word]
+        )
 
-        # if torch.cuda.is_available():
-        #   vc_checkpoint = torch.load(root_path + vc_model_path)
-        # else:
-        #   vc_checkpoint = torch.load(root_path + vc_model_path, map_location='cpu')
-        # self.video_captioner.load_state_dict(vc_checkpoint['params'])
+        if torch.cuda.is_available():
+          vc_checkpoint = torch.load(root_path + vc_model_path)
+        else:
+          vc_checkpoint = torch.load(root_path + vc_model_path, map_location='cpu')
+        self.video_captioner.load_state_dict(vc_checkpoint['params'])
 
-        # # Construct TTS
+        # Construct TTS
         # self.tts = TTS()
 
         # Push all torch models to GPU / set on eval mode
