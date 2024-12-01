@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animal Classification Page</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        
+        h1 {
+            margin-bottom: 20px;
+            color: #333333;
+        }
+        
+        .file-input {
+            margin-bottom: 20px;
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cccccc;
+            border-radius: 4px;
+        }
+        
+        .submit-btn {
+            background-color: #007bff;
+            color: #ffffff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .submit-btn2 {
+            margin-top:10px;
+            background-color: #007bff;
+            color: #ffffff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .submit-btn3 {
+            margin-top:10px;
+            background-color: #007bff;
+            color: #ffffff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .submit-btn:hover {
+            background-color: #0056b3;
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #cccccc;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            min-height: 50px;
+        }
+
+        #preview {
+            margin-top: 20px;
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            display: none;
+        }
+
+        #videoPreview {
+            margin-top: 20px;
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            display: none;
+        }
+    </style>
+
+</head>
+<body>
+    <div class="container">
+        <h1>Upload Images or Videos for a description generation!</h1>
+        <form id="uploadForm" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" id="fileInput" class="file-input" name="input_file" accept="image/*,video/*" required>
+            <button type="button" id="uploadBtn" class="submit-btn">Generate Description</button>
+            <button type="button" id="sceneBtn" class="submit-btn2 hidden-btn">Generate Video Description By Scene</button>
+
+        </form>
+        
+
+        <!-- Live Video Stream -->
+        <button type="button" id="liveStreamBtn" class="submit-btn3">Start Live Video Stream</button>
+        <button type="button" id="stopStreamBtn" class="submit-btn4" style="display: none;">Stop Live Video Stream</button>
+        <video id="videoElement" autoplay></video>
+        <div id="captions"></div>
+
+
+        <!-- Preview for Image or Video -->
+        <img id="preview" alt="Image Preview">
+        <video id="videoPreview" controls>
+            <source id="videoSource" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+
+        <!-- Audio Player -->
+        <div id="audio-container" class="audio-container">
+            <audio id="audioPlayer" controls style="display: none;">
+                <source id="audioSource" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+        </div>
+
+        <div id="loading"></div>
+        <div id="message"></div>
+    </div>
+
+    <script>
+        const vidCheck = false;
+
+        const fileInput = document.getElementById("fileInput");
+        const previewImage = document.getElementById("preview");
+        const videoPreview = document.getElementById("videoPreview");
+        const liveStreamBtn = document.getElementById("liveStreamBtn");
+        const stopStreamBtn = document.getElementById("stopStreamBtn");
+        const videoElement = document.getElementById("videoElement");
+        const captionsDiv = document.getElementById("captions");
+        const audioPlayer = document.getElementById("audioPlayer");
+
+        if (vidCheck) {
+            sceneBtn.style.display = "inline-block";
+        } else {
+            sceneBtn.style.display = "none";
+        }
+
+        // Event Listener to Show Preview of Selected File
+        fileInput.addEventListener("change", () => {
+            const file = fileInput.files[0];
+
+            if (file) {
+                const fileUrl = URL.createObjectURL(file);
+                
+                if (file.type.startsWith('image/')) {
+                    // Show Image Preview
+                    previewImage.src = fileUrl;
+                    previewImage.style.display = "block";
+                    videoPreview.style.display = "none";
+                } else if (file.type.startsWith('video/')) {
+                    // Show Video Preview
+                    videoPreview.src = fileUrl;
+                    videoPreview.style.display = "block";
+                    previewImage.style.display = "none";
+                }
+            }
+        });
+
+        document.getElementById("uploadBtn").addEventListener("click", async () => {
+            const file = fileInput.files[0];
+            const filename = fileInput.files[0]?.name || "default_file_name";
+            const messageDiv = document.getElementById("message");
+            const loadingDiv = document.getElementById("loading");
+            const sceneBtn = document.getElementById("sceneBtn");
+
+            messageDiv.textContent = "";
+            loadingDiv.textContent = "Generating...";
+            loadingDiv.style.display = "block";
+
+            if (!file) {
+                alert("Please select a file!");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            try {
+                const response = await fetch("http://127.0.0.1:8000/generate_description/", {
+                    method: "POST",
+                    body: formData,
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    messageDiv.textContent = `Generated Description: ${result.message}`;
+                    if (result.vidFile) {
+                        sceneBtn.style.display = "inline-block";
+                    }
+                    const audioResponse = await fetch(`http://127.0.0.1:8000/generate_audio/?captions=${encodeURIComponent(result.message)}&file_name=${encodeURIComponent(filename)}`);
+
+                    if (audioResponse.ok) {
+                        const audioBlob = await audioResponse.blob();
+                        const audioUrl = URL.createObjectURL(audioBlob);
+
+                        // Set the audio source and make the audio player visible
+                        audioSource.src = audioUrl;
+                        audioPlayer.style.display = "block";
+                        audioPlayer.load();
+                    } else {
+                        messageDiv.textContent += `\nError generating audio: ${audioResponse.statusText}`;
+                    }
+                } else {
+                    const result = await response.json();
+                    messageDiv.textContent = `Error: ${result.error}`;
+                }
+            } catch (error) {
+                messageDiv.textContent = `Error: ${error.message}`;
+            } finally {
+                loadingDiv.style.display = "none"; // Hide loading message
+            }
+        });
+
+        document.getElementById("sceneBtn").addEventListener("click", async () => {
+            const fileInput = document.getElementById("fileInput");
+            const file = fileInput.files[0];
+            const filename = fileInput.files[0]?.name || "default_file_name";
+            const messageDiv = document.getElementById("message");
+            const loadingDiv = document.getElementById("loading");
+
+            messageDiv.textContent = "";
+            loadingDiv.textContent = "Generating scene-wise description...";
+            loadingDiv.style.display = "block";
+
+            if (!file) {
+                alert("Please select a file!");
+                return;
+            }
+            const formData = new FormData();
+            formData.append("file", file);
+
+            try {
+                const response = await fetch("http://127.0.0.1:8000/generate_description_by_scene/", {
+                    method: "POST",
+                    body: formData,
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    const captions = result.captions;
+                    const timecodes = result.timecodes;
+                    let combinedOutput = "";
+                    for (let i = 0; i < timecodes.length; i++) {
+                        combinedOutput += `(${timecodes[i][0]}, ${timecodes[i][1]}) ${captions[i]}\n`;
+                    }
+                    messageDiv.textContent = `Generated Description by scenes: ${combinedOutput}`;
+
+                    const audioResponse = await fetch(`http://127.0.0.1:8000/generate_audio/?captions=${encodeURIComponent(captions)}&file_name=${encodeURIComponent(filename)}`);
+
+                    if (audioResponse.ok) {
+                        const audioBlob = await audioResponse.blob();
+                        const audioUrl = URL.createObjectURL(audioBlob);
+
+                        // Set the audio source and make the audio player visible
+                        audioSource.src = audioUrl;
+                        audioPlayer.style.display = "block";
+                        audioPlayer.load();
+                    } else {
+                        messageDiv.textContent += `\nError generating audio: ${audioResponse.statusText}`;
+                    }
+                    sceneBtn.style.display = "none";
+
+                } else {
+                    const result = await response.json();
+                    messageDiv.textContent = `Error: ${result.error}`;
+                }
+            } catch (error) {
+                const result = await response.json();
+                messageDiv.textContent = `Error: ${result.error}`;
+            } finally {
+                loadingDiv.style.display = "none";
+            }
+
+        });
+
+        // Live Video Stream Button Event
+        liveStreamBtn.addEventListener("click", () => {
+            // Access the user's webcam for live streaming
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then((stream) => {
+                    videoElement.srcObject = stream;
+                    videoElement.style.display = "block";
+                    previewImage.style.display = "none";
+                    videoPreview.style.display = "none";
+    
+                    // Set up WebSocket connection to backend for live video streaming
+                    const ws = new WebSocket('ws://127.0.0.1:8000/ws/video_feed/');
+                    
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+    
+                    // Send video frames to the backend at intervals
+                    setInterval(() => {
+                        if (videoElement.readyState === videoElement.HAVE_ENOUGH_DATA) {
+                            canvas.width = videoElement.videoWidth;
+                            canvas.height = videoElement.videoHeight;
+                            context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+                            canvas.toBlob((blob) => {
+                                if (blob && ws.readyState === WebSocket.OPEN) {
+                                    ws.send(blob);
+                                }
+                            }, 'image/jpeg');
+                        }
+                    }, 200);
+    
+                    ws.onmessage = (event) => {
+                        const data = JSON.parse(event.data);
+    
+                        // Update captions in real time
+                        if (data.caption) {
+                            captionsDiv.textContent = data.caption;
+    
+                            // Play generated audio if available
+                            if (data.audio_url) {
+                                audioPlayer.src = data.audio_url;
+                                audioPlayer.style.display = "block";
+                                audioPlayer.play();
+                            }
+                        }
+                    };
+                })
+                .catch((error) => {
+                    console.error('Error accessing webcam:', error);
+                });
+        });
+
+        stopStreamBtn.addEventListener("click", () => {
+            // Stop the webcam stream
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+
+            // Hide video element and stop showing the stream
+            videoElement.style.display = "none";
+            stopStreamBtn.style.display = "none";
+            liveStreamBtn.style.display = "inline-block";
+
+            // Close WebSocket connection
+            if (ws) {
+                ws.close();
+            }
+
+            // Clear the interval for sending frames
+            if (sendInterval) {
+                clearInterval(sendInterval);
+            }
+
+            // Clear captions and hide audio player
+            captionsDiv.textContent = "";
+            audioPlayer.style.display = "none";
+            audioPlayer.pause();
+        });
+
+
+    </script>
+</body>
+</html>

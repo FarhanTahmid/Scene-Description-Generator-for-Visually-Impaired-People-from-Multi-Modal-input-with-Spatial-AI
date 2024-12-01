@@ -1,0 +1,135 @@
+"""Builds a Vocabulary with the COCO trainings set."""
+from __future__ import print_function, unicode_literals, division
+import re
+import os
+import sys
+import pickle
+import argparse
+from collections import Counter
+import unicodedata
+import nltk
+
+BASE_DIR=os.environ['PROJECT_DIRECTORY']
+
+sys.path.append(BASE_DIR+'software_utils/')
+
+from vocabulary import Vocabulary
+
+def unicode_to_ascii(s):
+    """Convert unicide string to plain ASCII."""
+    return ''.join(
+        c for c in unicodedata.normalize('NFD', s)
+        if unicodedata.category(c) != 'Mn'
+    )
+
+
+def normalize_string(s):
+    """Lowercase, trim, and remove non-letter characters."""
+    s = unicode_to_ascii(s.lower().strip())
+    s = re.sub(r"([.!?])", r" \1", s)
+    s = re.sub(r"[^a-zA-Z.!?]+", r" ", s)
+    return s
+
+
+def update_counter(counter, captions):
+    """Update word counters."""
+    # Tokenize and update token counter
+    for i, caption in enumerate(captions):
+        if i % 1000 == 0:
+            print('Tokenizing process: {}%\r'.format(
+                round(i / float(len(captions)) * 100.0), 2), end='')
+
+        caption = normalize_string(caption)
+        tokens = nltk.tokenize.word_tokenize(caption)
+        counter.update(tokens)
+
+
+def generate_vocabulary(counter, threshold):
+    """Generate vocabulary."""
+    vocab = Vocabulary()
+
+    # Keep words that have more occurances thatn threshold
+    words = sorted([word for word, cnt in counter.items() if cnt >= threshold])
+
+    # Add words to dictionary
+    for i, word in enumerate(words):
+        vocab.add_word(word)
+
+    return vocab
+
+
+def main(args):
+    """
+    Build coco vocabulary from COCO training dataset.
+
+    Args:
+        args: commandline arguments
+
+    """
+    # Load coco library
+    sys.path.append(args.coco_path + '/PythonAPI')
+    from pycocotools.coco import COCO
+
+    # Create token counter
+    counter = Counter()
+
+    # Sets to include in vocabulary
+    sets = args.sets.split(',')
+
+    for st in sets:
+        print('\nProcessing {}'.format(st))
+
+        # initialize coco dataset classes
+        coco = COCO(
+            args.coco_path +
+            'annotations/instances_{}.json'.format(st))
+        coco_anns = COCO(
+            args.coco_path +
+            'annotations/captions_{}.json'.format(st))
+
+        # get all categories
+        cats = coco.loadCats(coco.getCatIds())
+
+        # Get all unique image Ids
+        imgIds = []
+        for cat in cats:
+            imgId = coco.getImgIds(catIds=cat['id'])
+            imgIds += imgId
+        imgIds = list(set(imgIds))
+
+        # Extract captions from annotations
+        annIds = coco_anns.getAnnIds(imgIds=imgIds)
+        anns = coco_anns.loadAnns(annIds)
+        captions = [ann['caption'] for ann in anns]
+
+        # Update vocabulary with new captions
+        update_counter(counter, captions)
+
+    # Generate vocabulary
+    vocab = generate_vocabulary(counter, args.threshold)
+
+    # Save files
+    with open(args.vocab_path, 'wb') as f:
+        pickle.dump(vocab, f)
+
+    print('\n')
+    print('Vocabulary size: {}'.format(len(vocab)))
+    print('Vocabulary saved to {}'.format(args.vocab_path))
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--coco_path', type=str, help='coco root path',
+                        default=os.environ['PROJECT_DIRECTORY'] + 'cocoapi/')
+    
+    parser.add_argument('--vocab_path', type=str,
+                        help='desired vocab file path',
+                        default=os.environ['PROJECT_DIRECTORY']+'Data/processed/coco_vocab.pkl')
+    parser.add_argument('--threshold', type=int,
+                        help='minimum words threshold',
+                        default=5)
+    parser.add_argument('--sets', type=str,
+                        help='sets to include in vocabulary',
+                        default='train2014,train2017')
+    args = parser.parse_args()
+    main(args)

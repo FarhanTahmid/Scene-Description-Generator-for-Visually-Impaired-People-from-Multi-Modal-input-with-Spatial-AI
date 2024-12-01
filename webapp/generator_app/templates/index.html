@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/typewriter-effect@2.18.0/dist/core.js"></script>
+    <style>
+        a {
+            text-decoration: none;
+        }
+
+        .button {
+            width: 12em;
+            padding: 1em;
+            color: #fff;
+            background-color: salmon;
+            cursor: pointer;
+            position: relative;
+            bottom: 0px;
+            right: 0px;
+            box-shadow: 8px 8px 0px red;
+            text-align: center;
+            transition: all .25s;
+        }
+
+        .button:hover {
+            bottom: -4px;
+            right: -4px;
+            box-shadow: 4px 4px 0px red;
+        }
+
+        .button:active {
+            bottom: -7px;
+            right: -7px;
+            box-shadow: 1px 1px 0px red;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container col-xxl-8 px-4 py-5">
+        <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
+            <div class="col-10 col-sm-8 col-lg-6">
+                <img src="{% static "blind_man_cartoon.avif" %}"
+                    class="d-block mx-lg-auto img-fluid" alt="Blind man" width="700" height="500" loading="lazy">
+            </div>
+            <div class="col-lg-6">
+                <h3 class="display-5 fw-bold text-body-emphasis lh-1 mb-3">Scene Description Generator for Visually Impaired People from Multi-Modal Input with Spatial AI</h3>
+                <p class="lead" id="typewriter-text">An application that can generate contextual descriptions for real world scenes</p>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                    <a href="{% url 'generator_app:generator' %}">
+                        <div class="button">Start Using?</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var app = document.getElementById('typewriter-text');
+
+            var typewriter = new Typewriter(app, {
+                loop: false,
+                delay: 20,
+            });
+
+            typewriter.typeString('An application that can Generate Contextual Descriptions for Real World Scenes')
+                .start();
+        });
+    </script>
+</body>
+
+</html>
