@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Animal Classification Page</title>
+    <title>Generator</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <style>
@@ -11,139 +12,273 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
         }
-        
+
         body {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            background-color: #f5f5f5;
-        }
-        
-        .container {
-            background-color: #ffffff;
+            min-height: 100vh;
+            background: linear-gradient(201deg, rgba(255, 0, 0, 1) 7%, rgba(148, 89, 144, 1) 50%, rgba(0, 211, 255, 1) 100%);
+            /* Linear gradient background */
+            color: #e0e0e0;
+            /* Light text */
+            flex-direction: column;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
         }
-        
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            max-width: 900px;
+            width: 100%;
+            background-color: #1e1e1e;
+            /* Dark container background */
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+        }
+
         h1 {
+            font-size: 24px;
+            color: #bb86fc;
+            /* Light purple */
+            text-align: center;
             margin-bottom: 20px;
-            color: #333333;
         }
-        
-        .file-input {
-            margin-bottom: 20px;
+
+        .file-input,
+        .submit-btn,
+        .submit-btn2,
+        .submit-btn3,
+        .submit-btn4 {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #cccccc;
-            border-radius: 4px;
-        }
-        
-        .submit-btn {
-            background-color: #007bff;
-            color: #ffffff;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        .submit-btn2 {
-            margin-top:10px;
-            background-color: #007bff;
-            color: #ffffff;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        .submit-btn3 {
-            margin-top:10px;
-            background-color: #007bff;
-            color: #ffffff;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        
-        .submit-btn:hover {
-            background-color: #0056b3;
-        }
-        
-        .result {
-            margin-top: 20px;
-            padding: 10px;
-            border: 1px solid #cccccc;
-            border-radius: 4px;
-            background-color: #f9f9f9;
-            min-height: 50px;
-        }
-
-        #preview {
-            margin-top: 20px;
-            max-width: 100%;
-            max-height: 300px;
+            padding: 12px;
+            margin: 10px 0;
             border-radius: 8px;
-            border: 1px solid #ccc;
-            display: none;
+            border: 1px solid #444;
+            /* Darker border */
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background-color: #333;
+            /* Dark button background */
+            color: #fff;
+            /* Light text */
         }
 
+        .submit-btn:hover,
+        .submit-btn2:hover,
+        .submit-btn3:hover,
+        .submit-btn4:hover {
+            background-color: #6200ea;
+            /* Bright purple on hover */
+            transform: translateY(-2px);
+        }
+
+        .submit-btn2 {
+            background-color: #03dac6;
+            /* Teal color */
+        }
+
+        .submit-btn3 {
+            background-color: #ff9800;
+            /* Amber color */
+        }
+
+        .submit-btn4 {
+            background-color: #f44336;
+            /* Red color */
+        }
+
+        .submit-btn2:hover {
+            background-color: #018786;
+            /* Darker teal on hover */
+        }
+
+        .submit-btn3:hover {
+            background-color: #ff5722;
+            /* Darker amber on hover */
+        }
+
+        .submit-btn4:hover {
+            background-color: #d32f2f;
+            /* Darker red on hover */
+        }
+
+        .result {
+            padding: 10px;
+            border: 1px solid #444;
+            background-color: #333;
+            border-radius: 8px;
+        }
+
+        #preview,
         #videoPreview {
             margin-top: 20px;
-            max-width: 100%;
-            max-height: 300px;
+            width: 100%;
             border-radius: 8px;
-            border: 1px solid #ccc;
             display: none;
+        }
+
+        .box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #audio-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        audio {
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .right-section {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .preview-container,
+        .video-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #preview,
+        #videoPreview,
+        #videoElement {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+            display: block;
+        }
+
+        .message-box {
+            padding: 20px;
+            background-color: #1e1e1e;
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
+
+        #captions,
+        #loading,
+        #message {
+            margin-top: 10px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .file-input,
+            .submit-btn,
+            .submit-btn2,
+            .submit-btn3 {
+                padding: 10px;
+                font-size: 14px;
+            }
+
+            .submit-btn4 {
+                padding: 8px;
+                font-size: 14px;
+            }
+
+            .right-section {
+                position: relative;
+                height: 200px;
+            }
+
+            .preview-container,
+            .video-container {
+                height: 100%;
+            }
+
+            #preview,
+            #videoPreview,
+            #videoElement {
+                object-fit: contain;
+            }
         }
     </style>
 
+
 </head>
+
 <body>
     <div class="container">
-        <h1>Upload Images or Videos for a description generation!</h1>
-        <form id="uploadForm" method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <input type="file" id="fileInput" class="file-input" name="input_file" accept="image/*,video/*" required>
-            <button type="button" id="uploadBtn" class="submit-btn">Generate Description</button>
-            <button type="button" id="sceneBtn" class="submit-btn2 hidden-btn">Generate Video Description By Scene</button>
+        <div class="left-section">
+            <h1>Upload Images or Videos for Description Generation!</h1>
+            <form id="uploadForm" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="file" id="fileInput" class="file-input" name="input_file" accept="image/*,video/*"
+                    required>
+                <button type="button" id="uploadBtn" class="submit-btn">Generate Description</button>
+                <button type="button" id="sceneBtn" class="submit-btn2 hidden-btn">Generate Video Description By
+                    Scene</button>
+            </form>
 
-        </form>
-        
-
-        <!-- Live Video Stream -->
-        <button type="button" id="liveStreamBtn" class="submit-btn3">Start Live Video Stream</button>
-        <button type="button" id="stopStreamBtn" class="submit-btn4" style="display: none;">Stop Live Video Stream</button>
-        <video id="videoElement" autoplay></video>
-        <div id="captions"></div>
-
-
-        <!-- Preview for Image or Video -->
-        <img id="preview" alt="Image Preview">
-        <video id="videoPreview" controls>
-            <source id="videoSource" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
-
-        <!-- Audio Player -->
-        <div id="audio-container" class="audio-container">
-            <audio id="audioPlayer" controls style="display: none;">
-                <source id="audioSource" type="audio/mpeg">
-                Your browser does not support the audio element.
-            </audio>
+            <div class="box">
+                <!-- Live Video Stream -->
+                <button type="button" id="liveStreamBtn" class="submit-btn3">Start Live Video Stream</button>
+                <button type="button" id="stopStreamBtn" class="submit-btn4" style="display: none;">Stop Live Video
+                    Stream</button>
+            </div>
         </div>
 
-        <div id="loading"></div>
-        <div id="message"></div>
+        <div class="right-section">
+            <!-- Video Container to Stream Live Video -->
+            <div class="video-container">
+                <video id="videoElement" autoplay></video>
+            </div>
+
+            <div class="preview-container">
+                <!-- Preview for Image or Video -->
+                <img id="preview" alt="">
+                <video id="videoPreview" controls>
+                    <source id="videoSource" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+
+
+
+        </div>
+        <div></div>
+        <div class="message-box">
+            <!-- Audio Player -->
+            <div id="audio-container" class="audio-container">
+                <audio id="audioPlayer" controls style="display: none;">
+                    <source id="audioSource" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+
+            <div id="captions"></div>
+            <div id="loading"></div>
+            <div id="message"></div>
+        </div>
     </div>
 
     <script>
@@ -170,7 +305,7 @@
 
             if (file) {
                 const fileUrl = URL.createObjectURL(file);
-                
+
                 if (file.type.startsWith('image/')) {
                     // Show Image Preview
                     previewImage.src = fileUrl;
@@ -226,6 +361,8 @@
                         audioSource.src = audioUrl;
                         audioPlayer.style.display = "block";
                         audioPlayer.load();
+                        audioPlayer.play();
+
                     } else {
                         messageDiv.textContent += `\nError generating audio: ${audioResponse.statusText}`;
                     }
@@ -284,6 +421,8 @@
                         audioSource.src = audioUrl;
                         audioPlayer.style.display = "block";
                         audioPlayer.load();
+                        audioPlayer.play();
+
                     } else {
                         messageDiv.textContent += `\nError generating audio: ${audioResponse.statusText}`;
                     }
@@ -302,24 +441,31 @@
 
         });
 
+        let ws;  // Declare WebSocket globally to ensure it is accessible
+        let sendInterval;  // Declare the interval variable globally to clear it
+
         // Live Video Stream Button Event
         liveStreamBtn.addEventListener("click", () => {
+            const messageDiv = document.getElementById("message");
             // Access the user's webcam for live streaming
             navigator.mediaDevices.getUserMedia({ video: true })
-                .then((stream) => {
+                .then((userStream) => {
+                    // Store the stream in a global variable
+                    stream = userStream;
                     videoElement.srcObject = stream;
                     videoElement.style.display = "block";
                     previewImage.style.display = "none";
                     videoPreview.style.display = "none";
-    
+                    messageDiv.textContent = "";
+
                     // Set up WebSocket connection to backend for live video streaming
-                    const ws = new WebSocket('ws://127.0.0.1:8000/ws/video_feed/');
-                    
+                    ws = new WebSocket('ws://127.0.0.1:8000/ws/video_feed/');
+
                     const canvas = document.createElement('canvas');
                     const context = canvas.getContext('2d');
-    
+
                     // Send video frames to the backend at intervals
-                    setInterval(() => {
+                    sendInterval = setInterval(() => {
                         if (videoElement.readyState === videoElement.HAVE_ENOUGH_DATA) {
                             canvas.width = videoElement.videoWidth;
                             canvas.height = videoElement.videoHeight;
@@ -331,14 +477,14 @@
                             }, 'image/jpeg');
                         }
                     }, 200);
-    
+
                     ws.onmessage = (event) => {
                         const data = JSON.parse(event.data);
-    
+
                         // Update captions in real time
                         if (data.caption) {
                             captionsDiv.textContent = data.caption;
-    
+
                             // Play generated audio if available
                             if (data.audio_url) {
                                 audioPlayer.src = data.audio_url;
@@ -347,20 +493,27 @@
                             }
                         }
                     };
+
+                    // Toggle button visibility
+                    liveStreamBtn.style.display = "none";
+                    stopStreamBtn.style.display = "inline-block";
                 })
                 .catch((error) => {
                     console.error('Error accessing webcam:', error);
                 });
         });
 
+        // Stop Stream Button Event
         stopStreamBtn.addEventListener("click", () => {
             // Stop the webcam stream
             if (stream) {
                 stream.getTracks().forEach(track => track.stop());
             }
 
-            // Hide video element and stop showing the stream
+            // Hide video element
             videoElement.style.display = "none";
+
+            // Hide stop stream button and show live stream button
             stopStreamBtn.style.display = "none";
             liveStreamBtn.style.display = "inline-block";
 
@@ -381,6 +534,8 @@
         });
 
 
+
     </script>
 </body>
+
 </html>
